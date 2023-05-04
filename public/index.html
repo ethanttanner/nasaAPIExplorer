@@ -1,0 +1,327 @@
+`<!DOCTYPE>
+<html>
+	<head>
+	<title>Nasa API Explorer</title>
+	</head>
+	<body>
+	
+		<div id="app">
+			<!--- everything in here is managed by Vue --->
+			<div id="nav">
+			<h1>Nasa API Explorer</h1>
+				<nav>
+					<a @click="showApod">Astronomy Picture of Day</a>
+					<a @click="showRovers">Mars Rovers</a>
+					<a @click="showGallery">Image Gallery</a>
+				</nav>
+			</div>
+
+			<div class="main">
+
+        <div v-if="!login_div">
+          <button id="logout" @click="logout">Logout</button>
+        </div>
+
+			<div v-if= "login_div">
+				<h2>Login Here!</h2>
+
+          <label>Email</label>
+          <input type="text" v-model="email">
+
+          <br>
+
+          <label>Password</label>
+          <input type="password" v-model="password">
+					<br><br>
+
+					<button id="login_button" @click="login">Login</button>
+					<button id="login_cancel" @click="">Cancel</button>
+          <br>
+          <button id="toggle_sign_up" @click ="toggleSignUp">Sign Up</button>
+			</div>
+
+  <div v-if= "sign_up_div">
+        <h2>Register Here!</h2>
+          <label>First Name</label>
+          <input type="text" v-model="first_name">
+
+          <label>Last Name</label>
+          <input type="text" v-model="last_name">
+
+          <br>
+
+          <label>Email</label>
+          <input type="text" v-model="email">
+
+          <br>
+
+          <label>Password</label>
+          <input type="password" v-model="password">
+          
+
+          <br><br>
+
+          <button id="sign_up" @click="signUp">Sign Up</button>
+          <button id="login_cancel" @click="toggleSignUp">Cancel</button>
+      </div>
+
+
+				<div v-if="gallery" id="gallery">
+
+    			<ol>
+						<li v-for="image, i in images">
+
+							<h1><strong>{{ image.title }}</strong></h1>
+
+						<img :src="image.img" :alt="image.description">
+						<div><button @click="editImage(image)">Edit:</button> 
+						<button @click="deleteImage(image)">Delete:</button></div>
+			
+						<p>{{ image.description }}</p>
+
+
+						<div v-if="edit">
+							<input v-model="edit_title" type="text" size="75">
+							<br>
+			        <textarea v-model="edit_description" type="text" style="width:600px;height:200px;"></textarea>
+			            <br>
+			            <br>
+			        <button @click="saveEdit(image)">Back</button>
+			        <button @click="saveEdit(image)">Save</button>
+
+						</div>
+
+						</li>
+
+				</ol>
+			</div>
+
+
+
+
+
+<div v-if="apod" id="apod">
+				<label for="date-picker">Select a date:</label>
+    			<input type="date" id="date-picker" v-model="selectedDate">
+    			<button @click="fetchApod">Fetch Picture of the Day</button>
+
+
+
+
+
+      				<h1>{{ apodData.title }}</h1>
+      				<button class="add" @click="addToGallery">Add To Gallery</button>
+      				<img :src="apodData.url" :alt="apodData.title">
+      				<p>{{ apodData.explanation }}</p>
+
+    		</div>
+
+
+
+
+
+    		<div v-if="rovers" id="rovers">
+
+ 
+    <form @submit.prevent="fetchData">
+      <label for="endpoint">Choose your Rover: </label>
+      <select id="endpoint" v-model="selectedEndpoint">
+
+        <option value="spirit">Spirit</option>
+        <option value="opportunity">Opportunity</option>
+        <option value="curiosity">Curiosity</option>
+        <option value="perseverance">Perseverance</option>
+
+      </select>
+
+      <label for="date">      Select a date:</label>
+      <input id="date" type="date" v-model="selectedDate">
+
+      <button>Fetch Photos</button>
+    </form>
+
+    <div v-if="loading">Loading...</div>
+
+    <div v-if="error">{{ error }}</div>
+
+
+    <div v-if="data">
+        <ul>
+          <li v-for="photo in data.photos">
+            <img :src="photo.img_src" alt="Mars Rover Photo">
+            	<br>
+							<button class="add" @click="addRoverPhoto(photo.img_src, photo.camera.full_name, photo.earth_date)">Add To Gallery</button>
+            <p>Taken on Earth date {{ photo.earth_date }}</p>
+            <p>{{ photo.camera.full_name }}</p>
+          </li>
+        </ul>
+      </div>
+
+
+    		</div>
+</div>
+		</div>	
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.47/vue.global.min.js"></script>
+		<script src="app.js"></script>	
+	</body>	
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+  #logout {
+    float: right;
+  }
+h1 {
+	color: #30C5FF;
+	text-align: left;
+	padding-left: 10px;
+}
+a {
+	color: white;
+	text-decoration: none;
+	font-weight: bold;
+	display: block;
+}
+
+li button, button {
+	display: inline-block;
+  outline: none;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 15px;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 14px 24px;
+  border: none;
+  transition: box-shadow 0.2s ease 0s, -ms-transform 0.1s ease 0s, -webkit-transform 0.1s ease 0s, transform 0.1s ease 0s;
+  background: linear-gradient(to right, rgb(230, 30, 77) 0%, rgb(227, 28, 95) 50%, rgb(215, 4, 102) 100%);
+  color: #fff;
+  margin: 10px 10px 40px 20px;
+}
+li img {
+	width: 80%;
+}
+
+img {
+	width: 100%;
+}
+
+.add {
+
+	display: inline-block;
+  outline: none;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 14px 24px;
+  border: none;
+  transition: box-shadow 0.2s ease 0s, -ms-transform 0.1s ease 0s, -webkit-transform 0.1s ease 0s, transform 0.1s ease 0s;
+  background: linear-gradient(to right, rgb(230, 30, 77) 0%, rgb(227, 28, 95) 50%, rgb(215, 4, 102) 100%);
+  color: #fff;
+                
+ 	display: flex;
+ 	float: right;
+ 	margin-right: 200px;
+ 	margin-bottom: 10px;
+
+}
+
+
+#nav {
+	
+
+height: 100%;
+  width: 200px;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #111;
+  overflow-x: hidden;
+  padding-top: 20px;
+  padding-right: 15px;
+  padding: 20px 20px 20px 0px;
+}
+
+#nav a {
+  padding: 25px 6px 6px 32px;
+  text-decoration: none;
+  font-size: 25px;
+  color: #818181;
+  display: block;
+}
+
+#nav a:hover {
+  color: #f1f1f1;
+}
+li {
+	list-style-type: none;
+	margin-top: 50px;
+}
+.main {
+  margin-left: 200px; /* Same as the width of the sidenav */
+  padding: 20px 30px 20px 30px;
+  font-size: 20px;
+  color: white;
+  line-height: 1.6;
+}
+
+@media screen and (max-width: 1000px) {
+  .nav {padding-top: 15px;}
+  .nav a {font-size: 18px;}
+
+  #nav {
+  	height: auto;
+  	width: 100%;
+  position: absolute;
+  z-index: none;
+  top: 0;
+  left: 0;
+  padding-bottom: 40px;
+  }
+  .main {
+  	float:center;
+  	margin-left: 50px;
+  	margin-top: 250px;
+  }
+  h1 {
+  	padding-left:15px; 
+  	padding-top:20px;
+  	font-size: 50px;
+  }
+  #apod, #rovers, #gallery {
+  	margin-top:125px;
+  }
+  li button, button {
+  font-size: 30px;
+  line-height: 35px;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 40px 60px;
+  
+  margin: 30px 30px 50px 30px;
+}
+}
+
+
+
+html {
+	background-color: #2A2D34;
+}
+
+</style>
+
