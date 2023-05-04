@@ -2,6 +2,7 @@
 
 ![UI](https://user-images.githubusercontent.com/45900899/236092818-736081aa-8882-4d10-af55-c8d9057e785e.png)
 
+### The Nasa API Explorer is a web application built with Vue3, Express, MongoDB, and Mongoose, that enables users to explore NASA's vast collection of images, videos, and data. Users can easily filter through data based on dates or mars rovers and save images to their collection.
 
 ## Resource
 
