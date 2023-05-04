@@ -1,6 +1,7 @@
-[Nasa API Explorer] ()
+[Nasa API Explorer]  
 
-![nasa](https://github.com/ethanttanner/nasaAPIExplorer/tree/main/public/UI.png)
+![UI](https://user-images.githubusercontent.com/45900899/236092818-736081aa-8882-4d10-af55-c8d9057e785e.png)
+
 
 ## Resource
 
